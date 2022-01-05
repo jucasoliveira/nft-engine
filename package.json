@@ -1,0 +1,30 @@
+{
+  "name": "nft-engine",
+  "version": "1.0.0",
+  "description": "A node.js nft generador",
+  "main": "index.ts",
+  "scripts": {
+    "start": "nodemon ./index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jucasoliveira/nft-engine.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jucasoliveira/nft-engine/issues"
+  },
+  "homepage": "https://github.com/jucasoliveira/nft-engine#readme",
+  "dependencies": {
+    "canvas": "^2.8.0",
+    "typescript": "^4.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.7",
+    "nodemon": "^2.0.15",
+    "ts-node": "^10.4.0"
+  }
+}
