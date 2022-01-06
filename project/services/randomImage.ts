@@ -1,43 +1,6 @@
+import { AvatarConfigExtra, AvatarPart } from "../types/types";
+import { AvatarStyleCount, PalettePreset, SVGFilter } from "../utils/config";
 import fs from "fs";
-import { createCanvas, Image, loadImage } from "canvas";
-import {
-  format,
-  AvatarStyleCount,
-  SVGFilter,
-  PalettePreset,
-} from "./services/config";
-import { AvatarConfigExtra, AvatarPart } from "./types";
-import { Blob } from "buffer";
-
-const canvas = createCanvas(format.width, format.height);
-
-const ctx = canvas.getContext("2d");
-
-const img = new Image();
-
-if (!process.env.PWD) {
-  process.env.PWD = process.cwd();
-}
-
-export const createImage = async (
-  fileName: string,
-  filePath: string,
-  svg: string
-): Promise<void> => {
-  try {
-    const jsdom = require("jsdom");
-    const { JSDOM } = jsdom;
-    const dom = new JSDOM(svg);
-
-    var buf = Buffer.from(svg, "utf8");
-    const svgData = await loadImage(buf);
-    ctx.drawImage(svgData, format.width, format.height);
-    const buffer = canvas.toBuffer("image/png");
-    fs.writeFileSync("./test.png", buffer);
-  } catch (err) {
-    console.log(err);
-  }
-};
 
 export const getRandomStyle = (): AvatarConfigExtra => {
   const config = Object.keys(AvatarStyleCount).reduce(
@@ -71,9 +34,7 @@ export const generatePreview = async () => {
   const groups = await Promise.all(
     Object.keys(AvatarStyleCount).map(async (type) => {
       var svgRaw = `${fs.readFileSync(
-        `${__dirname}/public/avatar/preview/${type}/${
-          config[type as AvatarPart]
-        }.svg`
+        `./public/avatar/preview/${type}/${config[type as AvatarPart]}.svg`
       )}`;
 
       return `<g id="notion-avatar=${type}" ${

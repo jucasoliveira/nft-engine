@@ -1,0 +1,22 @@
+{
+  "name": "nft-engine",
+  "version": "1.0.0",
+  "description": "",
+  "main": "",
+  "scripts": {
+    "project": "",
+    "engine": "",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jucasoliveira/nft-engine.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jucasoliveira/nft-engine/issues"
+  },
+  "homepage": "https://github.com/jucasoliveira/nft-engine#readme"
+}

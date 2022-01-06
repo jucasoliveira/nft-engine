@@ -8,9 +8,8 @@ const edition = myArgs.length > 0 ? Number(myArgs[0]) : defaultEdition;
 const asyncFunction = async (): Promise<void> => {
   try {
     console.log("Generating preview...");
-    const preview = await generatePreview(edition);
-    console.log("Creating files...");
-    await createImage("image_1", "./src/public/images", preview);
+    const preview = await generatePreview();
+    // await createImage("image_1", "./src/public/images", preview);
   } catch (err) {
     console.log(err);
   }
