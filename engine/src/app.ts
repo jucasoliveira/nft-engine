@@ -25,13 +25,19 @@ export const createImage = async (
   svg: string
 ): Promise<void> => {
   try {
-    const svgData = await loadImage(svg);
+    const jsdom = require("jsdom");
+    const { JSDOM } = jsdom;
+    const dom = new JSDOM(svg);
+
+    // const image = await svgToImg.from(`${svg}`).toPng();
+
+    const svgData = await loadImage(dom);
+
+    console.log("svgData", svgData);
+
     ctx.drawImage(svgData, format.width, format.height);
     const buffer = canvas.toBuffer("image/png");
-    console.log(buffer);
-    const blob = new Blob([buffer], { type: "image/png" });
-    // const file = fs.createWriteStream(`${filePath}/${fileName}.png`);
-    // blob.pipe(file);
+    fs.writeFileSync("./test.png", buffer);
   } catch (err) {
     console.log(err);
   }
@@ -74,12 +80,12 @@ export const generatePreview = async (edition: number) => {
         }.svg`
       )}`;
 
-      return `\n<g id="notion-avatar=${type}" ${
+      return `<g id="notion-avatar=${type}" ${
         type === "face" ? `fill="${color}"` : ""
       }  ${
         isFlipped ? 'transform="scale(-1,1) translate(-1080, 0)"' : ""
-      }   > \n ${svgRaw.replace(/<svg.*(?=>)>/, "").replace("</svg>", "")}
-    \n</g>\n`;
+      }   > ${svgRaw.replace(/<svg.*(?=>)>/, "").replace("</svg>", "")}
+    </g>`;
     })
   );
 
@@ -93,6 +99,7 @@ export const generatePreview = async (edition: number) => {
       .trim()
       .replace(/(\n|\t)/g, "");
 
+  return previewSvg;
   return `<div
           style="background-color: ${randomBackground}"
         >
