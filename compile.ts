@@ -3,7 +3,23 @@ import fs from "fs";
 
 const solc = require("solc");
 
-const nftPath = path.resolve(__dirname, "contracts", "nft.sol");
-const source = fs.readFileSync(nftPath, "utf8");
+const inboxPath = path.resolve(__dirname, "contracts", "nft.sol");
+const source = fs.readFileSync(inboxPath, "utf8");
 
-console.log(solc.compile(source, 1));
+const input = {
+  language: "Solidity",
+  sources: {
+    "nft.sol": {
+      content: source,
+    },
+  },
+  settings: {
+    outputSelection: {
+      "*": {
+        "*": ["*"],
+      },
+    },
+  },
+};
+
+console.log(solc.compile(JSON.stringify(input)));
