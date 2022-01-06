@@ -1,167 +1,102 @@
 import fs from "fs";
-import { createCanvas, loadImage } from "canvas";
+import { createCanvas, Image, loadImage } from "canvas";
 import {
-  layersOrder,
   format,
-  rarity,
-  defaultEdition,
-  getElements,
+  AvatarStyleCount,
+  SVGFilter,
+  PalettePreset,
 } from "./services/config";
+import { AvatarConfigExtra, AvatarPart } from "./types";
+import { Blob } from "buffer";
 
 const canvas = createCanvas(format.width, format.height);
 
 const ctx = canvas.getContext("2d");
 
+const img = new Image();
+
 if (!process.env.PWD) {
   process.env.PWD = process.cwd();
 }
 
-const buildDir = `${process.env.PWD}/public/images`;
-const metDataFile = "_metadata.json";
-const layersDir = `${process.env.PWD}/layers`;
+export const createImage = async (
+  fileName: string,
+  filePath: string,
+  svg: string
+): Promise<void> => {
+  try {
+    const svgData = await loadImage(svg);
+    ctx.drawImage(svgData, format.width, format.height);
+    const buffer = canvas.toBuffer("image/png");
+    console.log(buffer);
+    const blob = new Blob([buffer], { type: "image/png" });
+    // const file = fs.createWriteStream(`${filePath}/${fileName}.png`);
+    // blob.pipe(file);
+  } catch (err) {
+    console.log(err);
+  }
+};
 
-let metadata: {
-  hash: string;
-  decodedHash: any[];
-  edition: string;
-  date: number;
-  attributes: any[];
-}[] = [];
-let attributes: { id: any; layer: any; name: any; rarity: any }[] = [];
-let hash: any[] = [];
-let decodedHash: { [x: number]: any }[] = [];
-const Exists = new Map();
+export const getRandomStyle = (): AvatarConfigExtra => {
+  const config = Object.keys(AvatarStyleCount).reduce(
+    (prev, next) =>
+      Object.assign(prev, {
+        [next]: Math.floor(
+          Math.random() * (AvatarStyleCount[next as AvatarPart] + 1)
+        ),
+      }),
+    {} as Record<keyof AvatarConfigExtra, number>
+  );
+  // for harmony
+  config.beard = 0;
+  config.details = 0;
+  config.accessories = 0;
 
-const layersSetup = (layersOrder: any[]) => {
-  const layers = layersOrder.map(
-    (layer: { name: string; number: number }, index) => ({
-      id: index,
-      name: layer.name,
-      location: `${layersDir}/${layer.name}/`,
-      elements: getElements(`${layersDir}/${layer.name}/`),
-      position: { x: 0, y: 0 },
-      size: { width: format.width, height: format.height },
-      number: layer.number,
+  return config;
+};
+
+const rollDicesForBackground = Math.random() * (100 - 0) + 0;
+const randomBackground =
+  (rollDicesForBackground < 20 &&
+    PalettePreset[Math.floor(Math.random() * PalettePreset.length)]) ||
+  "#999999";
+
+export const generatePreview = async (edition: number) => {
+  const config = { ...getRandomStyle() };
+  const color = "#" + Math.floor(Math.random() * 16777215).toString(16);
+  const isFlipped = Math.random() > 0.5;
+
+  const groups = await Promise.all(
+    Object.keys(AvatarStyleCount).map(async (type) => {
+      var svgRaw = `${fs.readFileSync(
+        `${__dirname}/public/avatar/preview/${type}/${
+          config[type as AvatarPart]
+        }.svg`
+      )}`;
+
+      return `\n<g id="notion-avatar=${type}" ${
+        type === "face" ? `fill="${color}"` : ""
+      }  ${
+        isFlipped ? 'transform="scale(-1,1) translate(-1080, 0)"' : ""
+      }   > \n ${svgRaw.replace(/<svg.*(?=>)>/, "").replace("</svg>", "")}
+    \n</g>\n`;
     })
   );
-  return layers;
-};
 
-export const buildSetup = () => {
-  if (fs.existsSync(buildDir)) {
-    fs.rmdirSync(buildDir, { recursive: true });
-  }
-  fs.mkdirSync(buildDir);
-};
+  const previewSvg =
+    `<svg viewBox="0 0 1080 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
+      ${SVGFilter}
+      <g id="notion-avatar" filter="url(#filter)">
+        ${groups.join("\n\n")}
+      </g>
+      </svg>`
+      .trim()
+      .replace(/(\n|\t)/g, "");
 
-const saveLayer = (
-  _canvas: { toBuffer: (arg0: string) => string | NodeJS.ArrayBufferView },
-  _edition: string
-) => {
-  fs.writeFileSync(
-    `${buildDir}/${_edition}.png`,
-    _canvas.toBuffer("image/png")
-  );
-};
-
-const addMetadata = (_edition: any) => {
-  let dateTime = Date.now();
-  let tempMetadata = {
-    hash: hash.join(""),
-    decodedHash: decodedHash,
-    edition: _edition,
-    date: dateTime,
-    attributes: attributes,
-  };
-  metadata.push(tempMetadata);
-  attributes = [];
-  hash = [];
-  decodedHash = [];
-};
-
-const addAttributes = (
-  _element: { id: any; name: any; rarity: any },
-  _layer: { id?: any; name?: string; number?: number }
-) => {
-  let tempAttr = {
-    id: _element.id,
-    layer: _layer.name,
-    name: _element.name,
-    rarity: _element.rarity,
-  };
-  attributes.push(tempAttr);
-  hash.push(_layer.id);
-  hash.push(_element.id);
-  decodedHash.push({ [_layer.id]: _element.id });
-};
-
-const drawLayer = async (
-  _layer: {
-    id?: number;
-    name?: string;
-    location: any;
-    elements: any;
-    position: any;
-    size: any;
-    number: any;
-  },
-  _edition: any
-) => {
-  const rand = Math.random();
-  let element = _layer.elements[Math.floor(rand * _layer.number)]
-    ? _layer.elements[Math.floor(rand * _layer.number)]
-    : null;
-  if (element) {
-    addAttributes(element, _layer);
-    const image = await loadImage(`${_layer.location}${element.fileName}`);
-
-    ctx.drawImage(
-      image,
-      _layer.position.x,
-      _layer.position.y,
-      _layer.size.width,
-      _layer.size.height
-    );
-    saveLayer(canvas, _edition);
-  }
-};
-
-export const createFiles = async (edition: number) => {
-  const layers = layersSetup(layersOrder);
-
-  let numDupes = 0;
-  for (let i = 1; i <= edition; i++) {
-    await layers.forEach(async (layer) => {
-      await drawLayer(layer, i);
-    });
-
-    let key = hash.toString();
-    if (Exists.has(key)) {
-      console.log(
-        `Duplicate creation for edition ${i}. Same as edition ${Exists.get(
-          key
-        )}`
-      );
-      numDupes++;
-      if (numDupes > edition) break; //prevents infinite loop if no more unique items can be created
-      i--;
-    } else {
-      Exists.set(key, i);
-      addMetadata(i);
-      console.log("Creating edition " + i);
-    }
-  }
-};
-
-export const createMetaData = () => {
-  fs.stat(`${buildDir}/${metDataFile}`, (err) => {
-    if (err == null || err.code === "ENOENT") {
-      fs.writeFileSync(
-        `${buildDir}/${metDataFile}`,
-        JSON.stringify(metadata, null, 2)
-      );
-    } else {
-      console.log("Oh no, error: ", err.code);
-    }
-  });
+  return `<div
+          style="background-color: ${randomBackground}"
+        >
+        ${previewSvg}
+        </div>
+  `;
 };
