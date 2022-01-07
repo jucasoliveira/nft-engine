@@ -57,10 +57,4 @@ export const generatePreview = async () => {
       .replace(/(\n|\t)/g, "");
 
   return previewSvg;
-  return `<div
-          style="background-color: ${randomBackground}"
-        >
-        ${previewSvg}
-        </div>
-  `;
 };
