@@ -42,6 +42,9 @@ npm run dev
 
 Project might appear on your localhost : http://localhost:3000
 
+<img width="1354" alt="Screenshot 2022-01-10 at 12 34 11" src="https://user-images.githubusercontent.com/11979969/148768699-ebaa6345-b59a-4c90-ad37-83352eef3466.png">
+
+
 
 ## Upload to IPFS (blocked)
 
