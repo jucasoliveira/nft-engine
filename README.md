@@ -12,3 +12,37 @@ Project progress:
 - [ ] Connect to `MetaMask`
 - [x] Deploy `smart contract`
 - [ ] Mint `metadata`
+
+# Quick start
+
+Go to poject directory
+```bash
+cd ./project
+```
+
+Install dependencies
+
+```bash
+yarn
+```
+or 
+```bash
+npm install
+```
+
+## Run development
+
+```bash
+yarn dev
+```
+or
+```bash
+npm run dev
+```
+
+Project might appear on your localhost : http://localhost:3000
+
+
+## Upload to IPFS (blocked)
+
+## Deploy Smart Contract (blocked)
