@@ -1,175 +1,126 @@
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+// SPDX-License-Identifier: GPL-3.0
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+pragma solidity >=0.7.0 <0.9.0;
+
+// Open Zeppelin imports
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
-import "@openzeppelin/contracts/utils/Context.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract facesNFT is
-    Context,
-    AccessControlEnumerable,
-    ERC721Enumerable,
-    ERC721URIStorage,
-    Ownable
-{
-    using Counters for Counters.Counter;
-    Counters.Counter public _tokenIdTracker;
+// Inherits
+contract facesNFT is ERC721Enumerable, Ownable {
+    using Strings for uint256;
 
-    string private _baseTokenURI;
-    uint256 private _price;
-    uint256 private _max;
-    address _wallet;
+    string public baseURI;
+    string public baseExtension = ".json";
+    uint256 public cost = 1; // Set this to your cost per NFT
+    uint256 public maxSupply = 40; // Set this to your max # of NFTs for the collection
+    uint256 public maxMintAmount = 5; // Set this to your max # of NFTs for any wallet
+    address public owner1 = 0x5283946450e31fAFeBB19a12359657B665fBBD8F; // Set this to first team member address
+    address public owner2 = 0x8E0B45D8a092c66Ab6614894f1C7FbAd41625706; // Set this to second team member address (different address)
 
-    bool _openMint;
-    bool _openWhitelistMint;
-
-    mapping(address => bool) private whitelist;
+    bool public paused = false;
+    mapping(address => uint256) public addressMintedBalance;
 
     constructor(
-        string memory name,
-        string memory symbol,
-        string memory baseTokenURI,
-        uint256 mintPrice,
-        uint256 max,
-        address wallet,
-        address admin
-    ) ERC721(name, symbol) {
-        _baseTokenURI = baseTokenURI;
-        _price = mintPrice;
-        _max = max;
-        _wallet = wallet;
-        _openMint = false;
-        _openWhitelistMint = false;
-        _setupRole(DEFAULT_ADMIN_ROLE, wallet);
-        _setupRole(DEFAULT_ADMIN_ROLE, admin);
+        string memory _name,
+        string memory _symbol,
+        string memory _initBaseURI, // usually in form of ipfs://<CID>
+        uint256 numTokenOnDeploy // This is how many NFTs are sent to the two owner addresses on deploy
+    ) ERC721(_name, _symbol) {
+        setBaseURI(_initBaseURI);
+        mint(owner1, numTokenOnDeploy);
+        mint(owner2, numTokenOnDeploy);
     }
 
+    // internal
     function _baseURI() internal view virtual override returns (string memory) {
-        return _baseTokenURI;
+        return baseURI;
     }
 
-    function setBaseURI(string memory baseURI) external {
+    // public
+    function mint(address _to, uint256 _mintAmount) public payable {
+        require(!paused, "the contract is paused");
+        uint256 supply = totalSupply();
+        require(_mintAmount > 0, "need to mint at least 1 NFT");
         require(
-            hasRole(DEFAULT_ADMIN_ROLE, _msgSender()),
-            "facesNFT: must have admin role to change base URI"
+            _mintAmount <= maxMintAmount,
+            "max mint amount per session exceeded"
         );
-        _baseTokenURI = baseURI;
-    }
+        require(supply + _mintAmount <= maxSupply, "max NFT limit exceeded");
 
-    function setTokenURI(uint256 tokenId, string memory _tokenURI) external {
-        require(
-            hasRole(DEFAULT_ADMIN_ROLE, _msgSender()),
-            "facesNFT: must have admin role to change token URI"
-        );
-        _setTokenURI(tokenId, _tokenURI);
-    }
-
-    function setPrice(uint256 mintPrice) external {
-        require(
-            hasRole(DEFAULT_ADMIN_ROLE, _msgSender()),
-            "facesNFT: must have admin role to change price"
-        );
-        _price = mintPrice;
-    }
-
-    function setMint(bool openMint, bool openWhitelistMint) external {
-        require(
-            hasRole(DEFAULT_ADMIN_ROLE, _msgSender()),
-            "facesNFT: must have admin role to open/close mint"
-        );
-        _openMint = openMint;
-        _openWhitelistMint = openWhitelistMint;
-    }
-
-    function price() public view returns (uint256) {
-        return _price;
-    }
-
-    function mint(address[] memory toSend) public payable onlyOwner {
-        require(toSend.length <= 256, "facesNFT: max of 256 facesNFT per mint");
-        require(_openMint == true, "facesNFT: minting is closed");
-        require(
-            msg.value == _price * toSend.length,
-            "facesNFT: must send correct price"
-        );
-        require(
-            _tokenIdTracker.current() + toSend.length <= _max,
-            "facesNFT: not enough facesNFT left to be mint amount"
-        );
-        for (uint256 i = 0; i < toSend.length; i++) {
-            _mint(toSend[i], _tokenIdTracker.current());
-            _tokenIdTracker.increment();
+        if (msg.sender != owner() && msg.sender != owner2) {
+            require(msg.value >= cost * _mintAmount, "insufficient funds");
         }
-        payable(_wallet).transfer(msg.value);
+
+        for (uint256 i = 1; i <= _mintAmount; i++) {
+            addressMintedBalance[_to]++;
+            _safeMint(_to, supply + i);
+        }
     }
 
-    function mintWhitelist() public payable {
-        require(_openWhitelistMint == true, "facesNFT: minting is closed");
-        require(
-            whitelist[msg.sender] == true,
-            "facesNFT: user must be whitelisted to mint"
-        );
-        require(msg.value == _price, "facesNFT: must send correct price");
-        require(
-            _tokenIdTracker.current() < _max,
-            "facesNFT: all facesNFT have been minted"
-        );
-
-        whitelist[msg.sender] = false;
-        _mint(msg.sender, _tokenIdTracker.current());
-        _tokenIdTracker.increment();
-        payable(_wallet).transfer(msg.value);
-    }
-
-    function whitelistUser(address user) public {
-        require(
-            hasRole(DEFAULT_ADMIN_ROLE, _msgSender()),
-            "facesNFT: must have admin role to whitelist address"
-        );
-        whitelist[user] = true;
-    }
-
-    function whitelistStatus(address user) public view returns (bool) {
-        return whitelist[user];
-    }
-
-    function _burn(uint256 tokenId)
-        internal
-        virtual
-        override(ERC721, ERC721URIStorage)
-    {
-        return ERC721URIStorage._burn(tokenId);
+    function walletOfOwner(
+        address _owner /// Returns list of all token ids owned by given wallet
+    ) public view returns (uint256[] memory) {
+        uint256 ownerTokenCount = balanceOf(_owner);
+        uint256[] memory tokenIds = new uint256[](ownerTokenCount);
+        for (uint256 i; i < ownerTokenCount; i++) {
+            tokenIds[i] = tokenOfOwnerByIndex(_owner, i);
+        }
+        return tokenIds;
     }
 
     function tokenURI(uint256 tokenId)
         public
         view
-        override(ERC721, ERC721URIStorage)
+        virtual
+        override
         returns (string memory)
     {
-        return ERC721URIStorage.tokenURI(tokenId);
+        require(
+            _exists(tokenId),
+            "ERC721Metadata: URI query for nonexistent token"
+        );
+
+        string memory currentBaseURI = _baseURI();
+        return
+            bytes(currentBaseURI).length > 0
+                ? string(
+                    abi.encodePacked(
+                        currentBaseURI,
+                        "/NFTname",
+                        tokenId.toString(),
+                        baseExtension
+                    )
+                ) //Change "/NFTname" to "/YourNFTName". If is fine to use no name but DO NOT REMOVE THE SLASH
+                : "";
     }
 
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 tokenId
-    ) internal virtual override(ERC721, ERC721Enumerable) {
-        super._beforeTokenTransfer(from, to, tokenId);
+    //only owner
+
+    function setCost(uint256 _newCost) public onlyOwner {
+        cost = _newCost;
     }
 
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        virtual
-        override(AccessControlEnumerable, ERC721, ERC721Enumerable)
-        returns (bool)
-    {
-        return super.supportsInterface(interfaceId);
+    function setmaxMintAmount(uint256 _newmaxMintAmount) public onlyOwner {
+        maxMintAmount = _newmaxMintAmount;
+    }
+
+    function setBaseURI(string memory _newBaseURI) public onlyOwner {
+        baseURI = _newBaseURI;
+    }
+
+    function pause(bool _state) public onlyOwner {
+        paused = _state;
+    }
+
+    // This function withdraws all funds from the contract giving half to team member one and half to team member two
+    function withdraw() public payable onlyOwner {
+        (bool PP1, ) = payable(owner2).call{
+            value: (address(this).balance * 50) / 100
+        }("");
+        require(PP1);
+        (bool PP2, ) = payable(owner1).call{value: address(this).balance}("");
+        require(PP2);
+        // =============================================================================
     }
 }
