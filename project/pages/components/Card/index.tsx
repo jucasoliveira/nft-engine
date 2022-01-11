@@ -1,6 +1,4 @@
 import React from "react";
-import { AvatarBackgroundConfig, ShapeStyle } from "../../../types/types";
-import Button from "../Button";
 import Link from 'next/link'
 
 
@@ -18,7 +16,7 @@ export default function Card({background , ShapeStyleMapping, svgPreview , Defau
           >
             <div className="mt-5 grid gap-y-10  sm:grid-cols-2  ">
               <div className="group relative">
-                  <div className="w-full min-h-40 bg-gray-200 aspect-w-1 aspect-h-1 rounded-md overflow-hidden group-hover:opacity-75 lg:h-40  lg:aspect-none">
+                  <div className="w-48 h-48 bg-gray-200 aspect-w-1 aspect-h-1 rounded-md overflow-hidden group-hover:opacity-75 md:w-72 md:h-72  lg:aspect-none">
                     <div
                       style={{
                         backgroundColor:
@@ -28,7 +26,7 @@ export default function Card({background , ShapeStyleMapping, svgPreview , Defau
 
                       }}
                       id="avatar-preview"
-                      className={`w-full min-h-40 bg-gray-200 aspect-w-1 aspect-h-1 overflow-hidden group-hover:opacity-75 lg:h-40 lg:aspect-none ${
+                      className={`w-48 h-48 md:w-72 md:h-72 ${
                         ShapeStyleMapping[background.shape]
                       }`}
                       dangerouslySetInnerHTML={{
@@ -49,7 +47,7 @@ export default function Card({background , ShapeStyleMapping, svgPreview , Defau
                       {attributes.accessories > 0 && <p className="mt-1 text-sm text-gray-500">Accessories</p>}
                       {attributes.beard > 0 && <p className="mt-1 text-sm text-gray-500">Beard</p>}
                     </div>
-                    <p className="text-sm font-medium text-gray-900">${price}</p>
+                    <p className="text-sm font-medium text-gray-900">{price/100} ETH</p>
                   </div>
               </div>
             </div>

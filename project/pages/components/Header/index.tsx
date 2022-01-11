@@ -2,6 +2,7 @@ import React, { useEffect, useState, Fragment } from "react";
 let Web3 = require("web3");
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { BellIcon, MenuIcon, XIcon } from '@heroicons/react/outline'
+import Image from 'next/image'
 
 const navigation = [
   { name: 'Dashboard', href: '#', current: true },
@@ -80,7 +81,17 @@ const Header = () => {
                 </Disclosure.Button>
               </div>
               <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
-                <div className="flex-shrink-0 flex items-center text-white">
+                <div className="flex-shrink-0 flex items-center text-white ">
+                      <Image
+                        src="/images/faces_logo.gif"
+                        alt="Notion Avatar Logo"
+                        width={50}
+                        height={50}
+                      />
+                </div>
+              </div>
+              <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
+                <div className="flex-shrink-0 flex items-center text-white ">
                       <div className="underline decoration-pink-500">Faces NFT</div>
                 </div>
               </div>
