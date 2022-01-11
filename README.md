@@ -9,7 +9,7 @@ Project progress:
 - [ ] Improve front-end
 - [x] Upload to `IPFS`
 - [ ] Create `metadata`
-- [ ] Connect to `MetaMask`
+- [x] Connect to `MetaMask`
 - [x] Deploy `smart contract`
 - [ ] Mint `metadata`
 
