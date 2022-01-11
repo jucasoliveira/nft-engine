@@ -18,7 +18,7 @@ export default function Card({background , ShapeStyleMapping, svgPreview , Defau
           >
             <div className="mt-5 grid gap-y-10  sm:grid-cols-2  ">
               <div className="group relative">
-                  <div className="w-full min-h-40 bg-gray-200 aspect-w-1 aspect-h-1 rounded-md overflow-hidden group-hover:opacity-75 lg:h-60  lg:aspect-none">
+                  <div className="w-full min-h-40 bg-gray-200 aspect-w-1 aspect-h-1 rounded-md overflow-hidden group-hover:opacity-75 lg:h-40  lg:aspect-none">
                     <div
                       style={{
                         backgroundColor:
@@ -28,7 +28,7 @@ export default function Card({background , ShapeStyleMapping, svgPreview , Defau
 
                       }}
                       id="avatar-preview"
-                      className={`w-full min-h-40 bg-gray-200 aspect-w-1 aspect-h-1 overflow-hidden group-hover:opacity-75 lg:h-60 lg:aspect-none ${
+                      className={`w-full min-h-40 bg-gray-200 aspect-w-1 aspect-h-1 overflow-hidden group-hover:opacity-75 lg:h-40 lg:aspect-none ${
                         ShapeStyleMapping[background.shape]
                       }`}
                       dangerouslySetInnerHTML={{

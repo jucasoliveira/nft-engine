@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { generatePreview } from '../services/randomImage';
 import { PalettePreset, rollDices } from '../utils/config';
 import { DefaultBackgroundConfig, ShapeStyleMapping } from '../utils/const';
@@ -8,14 +8,8 @@ import Header from './components/Header';
 
 const IndexPage = ({generateImages}) => {
 
-  const [web3, setWeb3] = useState(null)
-  const [address, setAddress] = useState(null)
-
-
-
   
 return <div>
-  <Header/>
   <header className="bg-white shadow">
     <div className="max-w-7xl mx-auto py-4 px-3 sm:px-6 lg:px-8">
       <h1 className="text-3xl font-bold text-gray-900">
@@ -47,7 +41,7 @@ export async function getServerSideProps() {
     const preview = await generatePreview();
     generateImages.push({preview, randomBackground: preview.randomBackground})
   }
-
+12
 
   return {
     props: {

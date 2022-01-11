@@ -1,6 +1,6 @@
 import React from "react";
 import { useRouter } from 'next/router'
-import * as IPFS from 'ipfs-core'
+// import * as IPFS from 'ipfs-core'
 import { request } from 'http';
 import axios from 'axios';
 import html2canvas from 'html2canvas';

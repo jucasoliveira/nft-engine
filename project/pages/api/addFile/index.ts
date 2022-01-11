@@ -1,13 +1,15 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import * as IPFS from "ipfs-core";
+// import * as IPFS from "ipfs-core";
 
 const addFile = async (content, name) => {
+  /*
   const ipfs = await IPFS.create();
   const addFile = await ipfs.add({
     path: name,
     content,
   });
   return addFile;
+  */
 };
 
 const handler = (_req: NextApiRequest, res: NextApiResponse) => {
