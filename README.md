@@ -1,5 +1,8 @@
 # facesNFT
 A node.js nft generador
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/11979969/148960820-6f3dafc8-49c8-4dc1-aeeb-888bc49e8177.gif" />
+</p>
 
 note: The SVG images of this project is for STUDY only and not meant to become an actual NFT, I recommend using your own SVG images to create your own live project.
 
