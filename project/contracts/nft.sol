@@ -1,126 +1,78 @@
-// SPDX-License-Identifier: GPL-3.0
+//SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
 
-pragma solidity >=0.7.0 <0.9.0;
+import '@openzeppelin/contracts/utils/Counters.sol';
+import '@openzeppelin/contracts/access/Ownable.sol';
+import '@openzeppelin/contracts/utils/math/SafeMath.sol';
+import '@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol';
 
-// Open Zeppelin imports
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-
-// Inherits
 contract facesNFT is ERC721Enumerable, Ownable {
-    using Strings for uint256;
+  using SafeMath for uint256;
+  using Counters for Counters.Counter;
 
-    string public baseURI;
-    string public baseExtension = ".json";
-    uint256 public cost = 1; // Set this to your cost per NFT
-    uint256 public maxSupply = 40; // Set this to your max # of NFTs for the collection
-    uint256 public maxMintAmount = 5; // Set this to your max # of NFTs for any wallet
-    address public owner1 = 0x5283946450e31fAFeBB19a12359657B665fBBD8F; // Set this to first team member address
-    address public owner2 = 0x8E0B45D8a092c66Ab6614894f1C7FbAd41625706; // Set this to second team member address (different address)
+  Counters.Counter private _tokenIds;
 
-    bool public paused = false;
-    mapping(address => uint256) public addressMintedBalance;
+  uint256 public constant MAX_SUPPLY = 100;
+  uint256 public constant PRICE = 0.01 ether;
+  uint256 public constant MAX_PER_MINT = 5;
 
-    constructor(
-        string memory _name,
-        string memory _symbol,
-        string memory _initBaseURI, // usually in form of ipfs://<CID>
-        uint256 numTokenOnDeploy // This is how many NFTs are sent to the two owner addresses on deploy
-    ) ERC721(_name, _symbol) {
-        setBaseURI(_initBaseURI);
-        mint(owner1, numTokenOnDeploy);
-        mint(owner2, numTokenOnDeploy);
+  string public baseTokenURI;
+
+  constructor(string memory baseURI) ERC721('NFT Collectible', 'NFTC') {
+    setBaseURI(baseURI);
+  }
+
+  function reserveNFTs() public onlyOwner {
+    uint256 totalMinted = _tokenIds.current();
+
+    require(totalMinted.add(10) < MAX_SUPPLY, 'Not enough NFTs left to reserve');
+
+    for (uint256 i = 0; i < 10; i++) {
+      _mintSingleNFT();
     }
+  }
 
-    // internal
-    function _baseURI() internal view virtual override returns (string memory) {
-        return baseURI;
+  function _baseURI() internal view virtual override returns (string memory) {
+    return baseTokenURI;
+  }
+
+  function setBaseURI(string memory _baseTokenURI) public onlyOwner {
+    baseTokenURI = _baseTokenURI;
+  }
+
+  function mintNFTs(uint256 _count) public payable {
+    uint256 totalMinted = _tokenIds.current();
+
+    require(totalMinted.add(_count) <= MAX_SUPPLY, 'Not enough NFTs left!');
+    require(_count > 0 && _count <= MAX_PER_MINT, 'Cannot mint specified number of NFTs.');
+    require(msg.value >= PRICE.mul(_count), 'Not enough ether to purchase NFTs.');
+
+    for (uint256 i = 0; i < _count; i++) {
+      _mintSingleNFT();
     }
+  }
 
-    // public
-    function mint(address _to, uint256 _mintAmount) public payable {
-        require(!paused, "the contract is paused");
-        uint256 supply = totalSupply();
-        require(_mintAmount > 0, "need to mint at least 1 NFT");
-        require(
-            _mintAmount <= maxMintAmount,
-            "max mint amount per session exceeded"
-        );
-        require(supply + _mintAmount <= maxSupply, "max NFT limit exceeded");
+  function _mintSingleNFT() private {
+    uint256 newTokenID = _tokenIds.current();
+    _safeMint(msg.sender, newTokenID);
+    _tokenIds.increment();
+  }
 
-        if (msg.sender != owner() && msg.sender != owner2) {
-            require(msg.value >= cost * _mintAmount, "insufficient funds");
-        }
+  function tokensOfOwner(address _owner) external view returns (uint256[] memory) {
+    uint256 tokenCount = balanceOf(_owner);
+    uint256[] memory tokensId = new uint256[](tokenCount);
 
-        for (uint256 i = 1; i <= _mintAmount; i++) {
-            addressMintedBalance[_to]++;
-            _safeMint(_to, supply + i);
-        }
+    for (uint256 i = 0; i < tokenCount; i++) {
+      tokensId[i] = tokenOfOwnerByIndex(_owner, i);
     }
+    return tokensId;
+  }
 
-    function walletOfOwner(
-        address _owner /// Returns list of all token ids owned by given wallet
-    ) public view returns (uint256[] memory) {
-        uint256 ownerTokenCount = balanceOf(_owner);
-        uint256[] memory tokenIds = new uint256[](ownerTokenCount);
-        for (uint256 i; i < ownerTokenCount; i++) {
-            tokenIds[i] = tokenOfOwnerByIndex(_owner, i);
-        }
-        return tokenIds;
-    }
+  function withdraw() public payable onlyOwner {
+    uint256 balance = address(this).balance;
+    require(balance > 0, 'No ether left to withdraw');
 
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        virtual
-        override
-        returns (string memory)
-    {
-        require(
-            _exists(tokenId),
-            "ERC721Metadata: URI query for nonexistent token"
-        );
-
-        string memory currentBaseURI = _baseURI();
-        return
-            bytes(currentBaseURI).length > 0
-                ? string(
-                    abi.encodePacked(
-                        currentBaseURI,
-                        "/NFTname",
-                        tokenId.toString(),
-                        baseExtension
-                    )
-                ) //Change "/NFTname" to "/YourNFTName". If is fine to use no name but DO NOT REMOVE THE SLASH
-                : "";
-    }
-
-    //only owner
-
-    function setCost(uint256 _newCost) public onlyOwner {
-        cost = _newCost;
-    }
-
-    function setmaxMintAmount(uint256 _newmaxMintAmount) public onlyOwner {
-        maxMintAmount = _newmaxMintAmount;
-    }
-
-    function setBaseURI(string memory _newBaseURI) public onlyOwner {
-        baseURI = _newBaseURI;
-    }
-
-    function pause(bool _state) public onlyOwner {
-        paused = _state;
-    }
-
-    // This function withdraws all funds from the contract giving half to team member one and half to team member two
-    function withdraw() public payable onlyOwner {
-        (bool PP1, ) = payable(owner2).call{
-            value: (address(this).balance * 50) / 100
-        }("");
-        require(PP1);
-        (bool PP2, ) = payable(owner1).call{value: address(this).balance}("");
-        require(PP2);
-        // =============================================================================
-    }
+    (bool success, ) = (msg.sender).call{value: balance}('');
+    require(success, 'Transfer failed.');
+  }
 }
