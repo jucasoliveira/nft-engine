@@ -5,7 +5,7 @@ import Web3 from 'web3';
  * @author brian wu
  */
 export const getWeb3 = () =>
-  new Promise((resolve, reject) => {
+  new Promise<Web3>((resolve, reject) => {
     window.addEventListener('load', async () => {
       if (window.ethereum) {
         const web3 = new Web3(window.ethereum);
@@ -21,8 +21,8 @@ export const getWeb3 = () =>
         console.log('Injected web3 detected.');
         resolve(web3);
       } else {
-        console.log(process.env.PUBLIC_URL);
-        const provider = new Web3.providers.HttpProvider('http://127.0.0.1:7545');
+        const urlProvider = `${process.env.NEXT_PUBLIC_NETWORK_URI}`;
+        const provider = new Web3.providers.HttpProvider(urlProvider);
         const web3 = new Web3(provider);
         console.log('No web3 instance injected, using Local web3.');
         resolve(web3);
@@ -45,7 +45,7 @@ export const getContractInstance = async (web3, contractName) => {
   window.instance = new web3.eth.Contract(
     contract.abi,
     deployedNetwork && deployedNetwork.address,
-    { from: user }
+    { from: user },
   );
   return window.instance;
 };

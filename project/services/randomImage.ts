@@ -1,18 +1,27 @@
 import { AvatarConfigExtra, AvatarPart } from '../types/types';
-import { AvatarStyleCount, PalettePreset, rollDices, SVGFilter } from '../utils/config';
+import {
+  AvatarStyleCount,
+  PalettePreset,
+  rollDices,
+  SVGFilter,
+} from '../utils/config';
 import fs from 'fs';
 
 export const getRandomStyle = (): AvatarConfigExtra => {
   const config = Object.keys(AvatarStyleCount).reduce(
     (prev, next) =>
       Object.assign(prev, {
-        [next]: Math.floor(Math.random() * (AvatarStyleCount[next as AvatarPart] + 1))
+        [next]: Math.floor(
+          Math.random() * (AvatarStyleCount[next as AvatarPart] + 1),
+        ),
       }),
-    {} as Record<keyof AvatarConfigExtra, number>
+    {} as Record<keyof AvatarConfigExtra, number>,
   );
   // for harmony
   const hasBeard = Math.random() > 0.5;
-  config.beard = hasBeard ? Math.floor(Math.random() * (AvatarStyleCount['beard'] + 1)) : 0;
+  config.beard = hasBeard
+    ? Math.floor(Math.random() * (AvatarStyleCount['beard'] + 1))
+    : 0;
   config.details = 0;
   config.accessories = 0;
 
@@ -33,24 +42,27 @@ export const generatePreview = async () => {
   const groups = await Promise.all(
     Object.keys(AvatarStyleCount).map(async (type) => {
       var svgRaw = `${fs.readFileSync(
-        `./public/avatar/preview/${type}/${config[type as AvatarPart]}.svg`
+        `./public/avatar/preview/${type}/${config[type as AvatarPart]}.svg`,
       )}`;
 
-      return `<g id="notion-avatar=${type}" ${type === 'face' ? `fill="${color}"` : ''}  ${
+      return `<g id="notion-avatar=${type}" ${
+        type === 'face' ? `fill="${color}"` : ''
+      }  ${
         isFlipped ? 'transform="scale(-1,1) translate(-1080, 0)"' : ''
       }   > ${svgRaw.replace(/<svg.*(?=>)>/, '').replace('</svg>', '')}
     </g>`;
-    })
+    }),
   );
 
-  const previewSvg = `<svg viewBox="0 0 1080 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
+  const previewSvg =
+    `<svg viewBox="0 0 1080 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
       ${SVGFilter}
       <g id="notion-avatar" filter="url(#filter)">
         ${groups.join('\n\n')}
       </g>
       </svg>`
-    .trim()
-    .replace(/(\n|\t)/g, '');
+      .trim()
+      .replace(/(\n|\t)/g, '');
 
   const basePrice = 10;
   const randomBackground =
@@ -65,5 +77,11 @@ export const generatePreview = async () => {
     (config.glasses ? config.glasses : 0) +
     (randomBackground === '#999999' ? 0 : 20);
 
-  return { previewSvg, isFlipped, attributes: config, price, randomBackground };
+  return {
+    previewSvg,
+    isFlipped,
+    attributes: config,
+    price,
+    randomBackground,
+  };
 };

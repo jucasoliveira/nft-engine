@@ -1,13 +1,13 @@
-import { useState, useEffect } from "react";
-import { getWeb3, getInstance } from "../services/web3util";
+import { useState, useEffect } from 'react';
+import { getWeb3, getInstance } from '../services/web3util';
 
 const useWeb3 = () => {
   const [state, setState] = useState({
-    user: "",
+    user: '',
     balance: 0,
-    contractInstance: "",
-    networkId: "",
-    networkType: "",
+    contractInstance: undefined,
+    networkId: '',
+    networkType: '',
     web3: undefined,
   });
 
@@ -16,7 +16,7 @@ const useWeb3 = () => {
       const web3 = await getWeb3();
       const user = (await web3.eth.getAccounts())[0];
       const balanceInWei = await web3.eth.getBalance(user);
-      var balance = web3.utils.fromWei(balanceInWei, "ether");
+      var balance = web3.utils.fromWei(balanceInWei, 'ether');
       const networkId = await web3.eth.net.getId();
       const networkType = await web3.eth.net.getNetworkType();
       const contractInstance = await getInstance(web3);
@@ -25,9 +25,9 @@ const useWeb3 = () => {
       window.user = user;
       setState({
         user: user,
-        balance: balance,
+        balance: parseInt(balance),
         contractInstance: contractInstance,
-        networkId: networkId,
+        networkId: networkId.toString(),
         networkType: networkType,
         web3: web3,
       });
