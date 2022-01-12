@@ -25,9 +25,9 @@ const useWeb3 = () => {
       window.user = user;
       setState({
         user: user,
-        balance: balance,
+        balance: parseInt(balance),
         contractInstance: contractInstance,
-        networkId: networkId,
+        networkId: networkId.toString(),
         networkType: networkType,
         web3: web3,
       });

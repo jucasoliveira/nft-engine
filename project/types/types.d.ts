@@ -71,3 +71,17 @@ export type MetaBlob = {
   name: string;
   description: string;
 };
+
+declare global {
+  interface Window {
+    ethereum: any;
+    web3: any;
+    user: string;
+    instance: any;
+  }
+}
+
+window.ethereum = window.ethereum || {};
+window.web3 = window.web3 || {};
+window.user = window.user || '';
+window.instance = window.instance || '';
