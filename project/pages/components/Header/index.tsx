@@ -1,7 +1,9 @@
 import React, { useEffect, useState, Fragment } from "react";
-let Web3 = require("web3");
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { BellIcon, MenuIcon, XIcon } from '@heroicons/react/outline'
+import Image from 'next/image'
+import { getWeb3 } from "../../../services/web3util";
+import useWeb3 from "../../../hooks/useWeb3";
 
 const navigation = [
   { name: 'Dashboard', href: '#', current: true },
@@ -14,54 +16,12 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-const Header = () => {
+const Header = (props) => {
+    console.log('Header props', props);
+    const web3Context = useWeb3();
 
-    const [web3, setWeb3] = useState(null)
-    const [address, setAddress] = useState(null);
-    const [balance, setBalance] = useState(null);
+    const { balance, user, contractInstance, networkId, networkType, web3 } = web3Context;
 
-    useEffect(() => {
-    const init = async () => {
-        await getWeb3(true);
-    }
-    init();
-    }, []);
-
-    console.log(web3)
-
-
-    const getWeb3 = async (isFirstLoad: boolean) => {
-        try {
-            let web3 = new Web3(Web3.givenProvider || "http://localhost:7545");
-            if (window.ethereum) {
-                web3 = new Web3(window.ethereum);
-                // Ask User permission to connect to Metamask
-                if (!isFirstLoad) {
-                    try {
-                        await window.ethereum.enable();
-                    } catch (err) {
-                        console.log('Transaction rejected by user:', err)
-                    };
-                };
-            } else if (window.web3) {
-                web3 = new Web3(window.web3.currentProvider);
-            } else {
-                window.alert('Non-Ethereum browser detected. Please install MetaMask plugin');
-                return;
-            };
-
-            var accounts = await web3.eth.getAccounts();
-            console.log(await web3.eth.getBalance(accounts[0]));
-            setAddress(accounts[0]);
-            setBalance(await web3.eth.getBalance(accounts[0]));
-            setWeb3(web3);  // Update web3 into Redux state
-
-            // ...
-        } catch (err) {
-            console.log('Error in Web3.tsx -> getWeb3(): ', err);
-        };
-    };
-  
     return (
     <Disclosure as="nav" className="bg-gray-800">
       {({ open }) => (
@@ -80,7 +40,17 @@ const Header = () => {
                 </Disclosure.Button>
               </div>
               <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
-                <div className="flex-shrink-0 flex items-center text-white">
+                <div className="flex-shrink-0 flex items-center text-white ">
+                      <Image
+                        src="/images/faces_logo.gif"
+                        alt="Notion Avatar Logo"
+                        width={50}
+                        height={50}
+                      />
+                </div>
+              </div>
+              <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
+                <div className="flex-shrink-0 flex items-center text-white ">
                       <div className="underline decoration-pink-500">Faces NFT</div>
                 </div>
               </div>
@@ -93,7 +63,7 @@ const Header = () => {
                         href='{item.href}'
                         className='bg-gray-900 text-white'
                       >
-                        { address ? address : 'Connecting wallet...' }
+                        { user ? user : 'Connecting wallet...' }
                       </a>
                     </Menu.Button>
                   </div>
@@ -113,7 +83,7 @@ const Header = () => {
                             href="#"
                             className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
                           >
-                            Your Balance {Math.round(balance / 1000000000000000000)} ETH
+                            Your Balance {Math.round(balance)} ETH
                           </a>
                         )}
                       </Menu.Item>
