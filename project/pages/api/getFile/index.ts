@@ -1,17 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import fs from 'fs';
-// import * as IPFS from "ipfs-core";
-//Required modules
-
-/*
-{
-  path: 'Qmc9nYE8ByeZpX5cFRTDSQdzR4x2kg8DWFPu6DMhEf4ZsT',
-  cid: CID(Qmc9nYE8ByeZpX5cFRTDSQdzR4x2kg8DWFPu6DMhEf4ZsT),
-  size: 12928,
-  mode: 420,
-  mtime: undefined
-}
-*/
+import { ipfsGet } from '../../../services/ipfsController';
 
 const getFile = async (ipfsPath) => {
   /*
@@ -22,10 +11,12 @@ const getFile = async (ipfsPath) => {
   }
   */
 };
-const handler = (_req: NextApiRequest, res: NextApiResponse) => {
+const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
   try {
-    getFile('Qmc9nYE8ByeZpX5cFRTDSQdzR4x2kg8DWFPu6DMhEf4ZsT');
-    res.status(200).json({ statusCode: 200, message: 'Success' });
+    const { body } = _req;
+    const { hash } = body;
+    const getImage = await ipfsGet(hash);
+    res.status(200).json({ statusCode: 200, message: 'Success', getImage });
   } catch (err: any) {
     res.status(500).json({ statusCode: 500, message: err.message });
   }

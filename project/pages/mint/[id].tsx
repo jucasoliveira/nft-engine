@@ -5,6 +5,10 @@ import { request } from 'http';
 import axios from 'axios';
 import html2canvas from 'html2canvas';
 import { CompatibleAgents, ShapeStyleMapping } from "../../utils/const";
+import { AvatarConfigExtra, MetaBlob, MetaData } from "../../types/types";
+import { uploadFileWithMetadata } from "../../services/ipfsController";
+import { handleMetaData } from "../api/upload";
+import { useCreateTokenAndSellArt } from "../../hooks/useMintNft";
 
 const Mint = () => {
   const router = useRouter()
@@ -14,25 +18,11 @@ const Mint = () => {
 
   const { background , svgPreview , DefaultBackgroundConfig} = object;
   const { attributes, price } = svgPreview;
+  const {response: createTokenAndSellArtResponse, createTokenAndSellArt } = useCreateTokenAndSellArt();
+
 
 
   const name = `${background.color === "#999999" ? "Normal" : "Rare"} - ${svgPreview.isFlipped ? "Flipped" : "Not Flipped"}`
-
-   const addFileToIpfs = async (imageURL:string) => {
-
-    var options = {
-      method: 'POST',
-      url: 'http://localhost:3000/api/addFile',
-      headers: {'Content-Type': 'application/json'},
-      data: {image: imageURL, name: `avatar-${new Date().getTime()}.png`}
-    };
-
-    axios.request(options).then(function (response) {
-      console.log(response.data);
-    }).catch(function (error) {
-      console.error(error);
-    });
-  }
 
   const generateCanvasFromAvatar = async () => {
     const dom: HTMLElement = document.querySelector('#avatar-preview') as HTMLElement;
@@ -44,18 +34,28 @@ const Mint = () => {
       width: dom.clientWidth,
       height: dom.clientHeight,
     });
-      const userAgent = window.navigator.userAgent.toLowerCase();
-      const isNeedCompatible = CompatibleAgents.some(agent => userAgent.indexOf(agent) >= 0);
-      // ga.event({ action: 'generate_canvas', params: { } });
-
-      // base64 only support png svg for now
       const imageURL = canvas.toDataURL();
      
       const a = document.createElement('a');
       a.href = imageURL;
-      a.download = `avatar-${new Date().getTime()}.png`;
-      a.click();
-     //addFileToIpfs(imageURL);
+      a.download = `${name}-avatar-${new Date().getTime()}.png`;
+     
+     const description = `Has ${attributes.glasses > 0 ? "Glasses" : ""},${attributes.accessories > 0 ? " Accessories" : ""},${attributes.beard >0 ? " Beard" : ""}`
+
+
+     const metadata = {name: `${name} - avatar-${new Date().getTime()}` , description}
+
+     const upload = await handleMetaData(imageURL, metadata)
+
+     console.log('MetaData uploaded', upload);
+
+     await createTokenAndSellArt({
+      price,
+      tokenURI: upload,
+     })
+
+
+     return upload;
 
   }
 

@@ -1,10 +1,7 @@
-import { useEffect, useState } from 'react';
 import { generatePreview } from '../services/randomImage';
-import { PalettePreset, rollDices } from '../utils/config';
 import { DefaultBackgroundConfig, ShapeStyleMapping } from '../utils/const';
 
 import Card from './components/Card';
-import Header from './components/Header';
 
 const IndexPage = ({generateImages}) => {
 

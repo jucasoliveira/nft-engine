@@ -11,7 +11,7 @@
 //   Nose
 // }
 
-export type Festival = "halloween" | "christmas";
+export type Festival = 'halloween' | 'christmas';
 export type FestivalTime = {
   [key in Festival]: {
     start: string;
@@ -38,7 +38,7 @@ export type AvatarConfigBase = {
 
 export type AvatarConfigExtra = AvatarConfigBase & FestivalAvatarConfig;
 
-export type BackgroundShape = "circle" | "square" | "none";
+export type BackgroundShape = 'circle' | 'square' | 'none';
 
 export type AvatarBackgroundConfig = {
   color: string;
@@ -52,7 +52,7 @@ export type ShapeStyle = {
 export type AvatarPart = keyof AvatarConfigBase;
 export type AvatarPartExtra = AvatarPart | Festival;
 
-export type ImageType = "png" | "svg";
+export type ImageType = 'png' | 'svg';
 
 export type ImageApiType = {
   [key in ImageType]: string;
@@ -62,3 +62,12 @@ export type AvatarConfig = {
   flip: number;
 } & AvatarConfigBase &
   AvatarBackgroundConfig;
+
+export type MetaData = {
+  image: string;
+} & MetaBlob;
+
+export type MetaBlob = {
+  name: string;
+  description: string;
+};
