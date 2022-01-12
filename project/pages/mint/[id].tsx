@@ -27,7 +27,6 @@ const Mint = () => {
   const generateCanvasFromAvatar = async () => {
     const dom: HTMLElement = document.querySelector('#avatar-preview') as HTMLElement;
 
-    console.log(dom.clientWidth, window.devicePixelRatio)
     const canvas = await html2canvas(dom, {
       logging: true,
       scale: window.devicePixelRatio,

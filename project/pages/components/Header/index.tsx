@@ -19,9 +19,6 @@ function classNames(...classes) {
 const Header = () => {
     const web3Context = useWeb3();
 
-    console.log('Header props', web3Context);
-
-
     const { balance, user, contractInstance, networkId, networkType, web3 } = web3Context;
 
     return (

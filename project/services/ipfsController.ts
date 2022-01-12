@@ -9,7 +9,8 @@
 
 import { create } from 'ipfs-http-client';
 import { MetaBlob, MetaData } from '../types/types';
-const client = create(`${process.env.NEXT_PUBLIC_IPFS_URI}`);
+const url = JSON.parse(`${process.env.NEXT_PUBLIC_IPFS_OPTION}`);
+const client = create(url);
 
 const uploadFileMetadata = ({ name, description, image }: MetaData) => {
   const metadata = JSON.stringify({
