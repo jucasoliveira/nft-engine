@@ -1,27 +1,26 @@
-import React, { useEffect, useState, Fragment } from "react";
-import { Disclosure, Menu, Transition } from '@headlessui/react'
-import { BellIcon, MenuIcon, XIcon } from '@heroicons/react/outline'
-import Image from 'next/image'
-import { getWeb3 } from "../../../services/web3util";
-import useWeb3 from "../../../hooks/useWeb3";
+import React, { Fragment } from 'react';
+import { Disclosure, Menu, Transition } from '@headlessui/react';
+import { MenuIcon, XIcon } from '@heroicons/react/outline';
+import Image from 'next/image';
+import { useAppContext } from '../../appContext';
 
 const navigation = [
   { name: 'Dashboard', href: '#', current: true },
   { name: 'Team', href: '#', current: false },
   { name: 'Projects', href: '#', current: false },
   { name: 'Calendar', href: '#', current: false },
-]
+];
 
 function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
+  return classes.filter(Boolean).join(' ');
 }
 
 const Header = () => {
-    const web3Context = useWeb3();
+  const web3Context = useAppContext();
 
-    const { balance, user, contractInstance, networkId, networkType, web3 } = web3Context;
+  const { balance, user } = web3Context;
 
-    return (
+  return (
     <Disclosure as="nav" className="bg-gray-800">
       {({ open }) => (
         <>
@@ -40,17 +39,19 @@ const Header = () => {
               </div>
               <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
                 <div className="flex-shrink-0 flex items-center text-white ">
-                      <Image
-                        src="/images/faces_logo.gif"
-                        alt="Notion Avatar Logo"
-                        width={50}
-                        height={50}
-                      />
+                  <Image
+                    src="/images/faces_logo.gif"
+                    alt="Notion Avatar Logo"
+                    width={50}
+                    height={50}
+                  />
                 </div>
               </div>
               <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
                 <div className="flex-shrink-0 flex items-center text-white ">
-                      <div className="underline decoration-pink-500">Faces NFT</div>
+                  <a href="/" className="underline decoration-pink-500">
+                    Faces NFT
+                  </a>
                 </div>
               </div>
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
@@ -58,11 +59,8 @@ const Header = () => {
                   <div>
                     <Menu.Button className="bg-gray-800 flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
                       <span className="sr-only">Open user menu</span>
-                      <a
-                        href='{item.href}'
-                        className='bg-gray-900 text-white'
-                      >
-                        { user ? user : 'Connecting wallet...' }
+                      <a href="{item.href}" className="bg-gray-900 text-white">
+                        {user ? user : 'Connecting wallet...'}
                       </a>
                     </Menu.Button>
                   </div>
@@ -80,7 +78,10 @@ const Header = () => {
                         {({ active }) => (
                           <a
                             href="#"
-                            className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
+                            className={classNames(
+                              active ? 'bg-gray-100' : '',
+                              'block px-4 py-2 text-sm text-gray-700',
+                            )}
                           >
                             Your Balance {Math.round(balance)} ETH
                           </a>
@@ -90,7 +91,10 @@ const Header = () => {
                         {({ active }) => (
                           <a
                             href="#"
-                            className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
+                            className={classNames(
+                              active ? 'bg-gray-100' : '',
+                              'block px-4 py-2 text-sm text-gray-700',
+                            )}
                           >
                             Settings
                           </a>
@@ -100,7 +104,10 @@ const Header = () => {
                         {({ active }) => (
                           <a
                             href="#"
-                            className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
+                            className={classNames(
+                              active ? 'bg-gray-100' : '',
+                              'block px-4 py-2 text-sm text-gray-700',
+                            )}
                           >
                             Sign out
                           </a>
@@ -121,8 +128,10 @@ const Header = () => {
                   as="a"
                   href={item.href}
                   className={classNames(
-                    item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                    'block px-3 py-2 rounded-md text-base font-medium'
+                    item.current
+                      ? 'bg-gray-900 text-white'
+                      : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                    'block px-3 py-2 rounded-md text-base font-medium',
                   )}
                   aria-current={item.current ? 'page' : undefined}
                 >
@@ -134,12 +143,8 @@ const Header = () => {
         </>
       )}
     </Disclosure>
-  )
-
-
-
-  }
-
+  );
+};
 
 export default Header;
 

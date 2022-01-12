@@ -1,15 +1,15 @@
-import fs from "fs";
-import { AvatarConfigBase } from "../types/types";
+import fs from 'fs';
+import { AvatarConfigBase } from '../types/types';
 
 export const layersOrder = [
-  { name: "background", number: 1 },
-  { name: "ball", number: 2 },
-  { name: "eye color", number: 12 },
-  { name: "iris", number: 3 },
-  { name: "shine", number: 1 },
-  { name: "shine", number: 1 },
-  { name: "bottom lid", number: 3 },
-  { name: "top lid", number: 3 },
+  { name: 'background', number: 1 },
+  { name: 'ball', number: 2 },
+  { name: 'eye color', number: 12 },
+  { name: 'iris', number: 3 },
+  { name: 'shine', number: 1 },
+  { name: 'shine', number: 1 },
+  { name: 'bottom lid', number: 3 },
+  { name: 'top lid', number: 3 },
 ];
 
 export const format = {
@@ -18,22 +18,22 @@ export const format = {
 };
 
 export const rarity = [
-  { key: "", val: "original" },
-  { key: "_r", val: "rare" },
-  { key: "_sr", val: "super rare" },
+  { key: '', val: 'original' },
+  { key: '_r', val: 'rare' },
+  { key: '_sr', val: 'super rare' },
 ];
 
 export const PalettePreset = [
-  "#fa541c",
-  "#faad14",
-  "#fadb14",
-  "#a0d911",
-  "#52c41a",
-  "#1890ff",
-  "#2f54eb",
-  "#722ed1",
-  "#eb2f96",
-  "#bfbfbf",
+  '#fa541c',
+  '#faad14',
+  '#fadb14',
+  '#a0d911',
+  '#52c41a',
+  '#1890ff',
+  '#2f54eb',
+  '#722ed1',
+  '#eb2f96',
+  '#bfbfbf',
 ];
 
 export const rollDices = Math.random() * (100 - 0) + 0;
@@ -79,7 +79,7 @@ const addRarity = (_str: string | string[]) => {
 const cleanName = (_str: string) => {
   let name: string = _str.slice(0, -4);
   rarity.forEach((r) => {
-    name = name.replace(r.key, "");
+    name = name.replace(r.key, '');
   });
   return name;
 };

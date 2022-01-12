@@ -45,7 +45,7 @@ export const getContractInstance = async (web3, contractName) => {
   window.instance = new web3.eth.Contract(
     contract.abi,
     deployedNetwork && deployedNetwork.address,
-    { from: user }
+    { from: user },
   );
   return window.instance;
 };
