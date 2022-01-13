@@ -4,6 +4,8 @@ const Web3Context = createContext({
   user: undefined,
   balance: 0,
   contractInstance: undefined,
+  tokenInstance: undefined,
+  marketInstance: undefined,
   networkId: undefined,
   networkType: undefined,
   web3: undefined,

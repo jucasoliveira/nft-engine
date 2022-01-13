@@ -53,3 +53,11 @@ export const getContractInstance = async (web3, contractName) => {
 export const getInstance = async (web3) => {
   return getContractInstance(web3, 'facesNFT');
 };
+
+export const getTokenInstance = async (web3) => {
+  return getContractInstance(web3, 'facesNFT');
+};
+
+export const getMarketInstance = async (web3) => {
+  return getContractInstance(web3, 'facesNFTMarket');
+};

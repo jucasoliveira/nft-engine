@@ -14,8 +14,8 @@
     "Atomics": "readonly",
     "SharedArrayBuffer": "readonly"
   },
-  "plugins": ["import", "jsx-a11y", "react", "react-hooks", "prettier"],
-  "extends": ["airbnb", "prettier", "next", "next/core-web-vitals"],
+  "plugins": [ "prettier"],
+  "extends": ["airbnb", "prettier", "next"],
   "rules": {
     "prettier/prettier": [
       "error",
@@ -25,12 +25,6 @@
     ],
     "camelcase": "off",
     "import/prefer-default-export": "off",
-    "react/prop-types": "off",
-    "react/jsx-filename-extension": "off",
-    "react/jsx-props-no-spreading": "off",
-    "react/no-unused-prop-types": "off",
-    "react/react-in-jsx-scope": "off",
-    "react/require-default-props": "off",
     "import/extensions": [
       "error",
       "ignorePackages",
@@ -41,15 +35,7 @@
         "jsx": "never"
       }
     ],
-    "quotes": "off",
-    "jsx-a11y/anchor-is-valid": [
-      "error",
-      {
-        "components": ["Link"],
-        "specialLink": ["hrefLeft", "hrefRight"],
-        "aspects": ["invalidHref", "preferButton"]
-      }
-    ]
+    "quotes": "off"
   },
   "overrides": [
     {
