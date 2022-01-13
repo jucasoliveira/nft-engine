@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import html2canvas from 'html2canvas';
 import { ShapeStyleMapping } from '../../utils/const';
 import { handleMetaData } from '../api/upload';
-import { useCreateTokenAndSellArt } from '../../hooks/useMintNft';
+import { useCreateMarketItem, useCreateTokenAndSellArt } from '../../hooks/useMintNft';
 import { GetStaticProps, GetStaticPaths } from 'next';
 
 function Mint ({ id }) {
@@ -17,8 +17,8 @@ function Mint ({ id }) {
   const { background, svgPreview, DefaultBackgroundConfig } = object;
   const { attributes, price } = svgPreview;
 
-  const { response: createTokenAndSellArtResponse, createTokenAndSellArt } =
-    useCreateTokenAndSellArt();
+  const { createMarketItem } =
+    useCreateMarketItem();
 
   const name = `${background.color === '#999999' ? 'Normal' : 'Rare'} - ${
     svgPreview.isFlipped ? 'Flipped' : 'Not Flipped'
@@ -54,9 +54,9 @@ function Mint ({ id }) {
 
     console.log('MetaData uploaded', upload);
 
-    await createTokenAndSellArt({
+    await createMarketItem({
+      url: upload,
       price,
-      tokenURI: upload,
     });
 
     return upload;
