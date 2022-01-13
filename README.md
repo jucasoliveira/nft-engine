@@ -35,12 +35,13 @@ Part 2 - The smart contract.
 ### Project progress:
 
 - [x] Generate Random `images`
-- [ ] Improve front-end
+- [X] Improve front-end
 - [x] Upload to `IPFS`
-- [ ] Create `metadata`
+- [X] Create `metadata`
 - [x] Connect to `MetaMask`
 - [x] Deploy `smart contract`
-- [ ] Mint `metadata`
+- [X] Mint `metadata`
+- [ ] Sell on the marketPlace
 
 # Quick start
 
