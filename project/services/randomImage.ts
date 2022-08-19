@@ -1,11 +1,6 @@
-import { AvatarConfigExtra, AvatarPart } from '../types/types';
-import {
-  AvatarStyleCount,
-  PalettePreset,
-  rollDices,
-  SVGFilter,
-} from '../utils/config';
 import fs from 'fs';
+import { AvatarConfigExtra, AvatarPart } from '../types/types';
+import { AvatarStyleCount, PalettePreset, SVGFilter } from '../utils/config';
 
 export const getRandomStyle = (): AvatarConfigExtra => {
   const config = Object.keys(AvatarStyleCount).reduce(
@@ -20,7 +15,7 @@ export const getRandomStyle = (): AvatarConfigExtra => {
   // for harmony
   const hasBeard = Math.random() > 0.5;
   config.beard = hasBeard
-    ? Math.floor(Math.random() * (AvatarStyleCount['beard'] + 1))
+    ? Math.floor(Math.random() * (AvatarStyleCount.beard + 1))
     : 0;
   config.details = 0;
   config.accessories = 0;
@@ -28,20 +23,14 @@ export const getRandomStyle = (): AvatarConfigExtra => {
   return config;
 };
 
-const rollDicesForBackground = Math.random() * (100 - 0) + 0;
-const randomBackground =
-  (rollDicesForBackground < 20 &&
-    PalettePreset[Math.floor(Math.random() * PalettePreset.length)]) ||
-  '#999999';
-
 export const generatePreview = async () => {
   const config = { ...getRandomStyle() };
-  const color = '#' + Math.floor(Math.random() * 16777215).toString(16);
+  const color = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
   const isFlipped = Math.random() > 0.5;
 
   const groups = await Promise.all(
     Object.keys(AvatarStyleCount).map(async (type) => {
-      var svgRaw = `${fs.readFileSync(
+      const svgRaw = `${fs.readFileSync(
         `./public/avatar/preview/${type}/${config[type as AvatarPart]}.svg`,
       )}`;
 

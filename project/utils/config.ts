@@ -84,16 +84,13 @@ const cleanName = (_str: string) => {
   return name;
 };
 
-export const getElements = (path: any) => {
-  return fs
+export const getElements = (path: any) =>
+  fs
     .readdirSync(path)
-    .filter((item: string) => !/(^|\/)\.[^\/\.]/g.test(item))
-    .map((i: any, index: number) => {
-      return {
-        id: index + 1,
-        name: cleanName(i),
-        fileName: i,
-        rarity: addRarity(i),
-      };
-    });
-};
+    .filter((item: string) => !/(^|\/)\.[^\\/\\.]/g.test(item))
+    .map((i: any, index: number) => ({
+      id: index + 1,
+      name: cleanName(i),
+      fileName: i,
+      rarity: addRarity(i),
+    }));
